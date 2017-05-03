@@ -52,3 +52,5 @@ Caught a Shark! It's a Great White
 
 This follows the semantics of try...catch...finally where the (optional) `Finally` func is invoked directly after `Try` and before any `Catch` function is called. The `Catch` function takes two arguments: an "exception", and a function. The exception is a pointer to a struct and is set if and only if the panic value is of the same indirect type. Only the first catch that meets these requirements is invoked.
 
+Ironically, this package declares no exception types.
+
