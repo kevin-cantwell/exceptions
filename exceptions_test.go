@@ -1,56 +1,69 @@
 package exceptions_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/kevin-cantwell/exceptions"
 )
 
-type throwable1 struct {
-	Cause string
-}
-
-type throwable2 struct {
-	Cause string
-}
-
 func TestExceptions(t *testing.T) {
-	exceptions.Do(
-		exceptions.Try(func() {
-			panic("foo")
-		}),
-		exceptions.Catch(func(e string) {
-			t.Log("caught string:", e)
-		}),
-		exceptions.Catch(func(e int64) {
-			t.Log("caught int64:", e)
-		}),
-		exceptions.Finally(func() {
-			t.Log("finally!")
-		}),
-	)
-	t.FailNow()
+	tests := []struct {
+		name        string
+		shouldPanic bool
+		panicWith   any
+	}{
+		{
+			name:        "string",
+			shouldPanic: true,
+			panicWith:   "foo",
+		},
+		{
+			name:        "error",
+			shouldPanic: true,
+			panicWith:   errors.New("bar"),
+		},
+		{
+			name:        "no panic",
+			shouldPanic: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var tried, caught, finally bool
+			exceptions.Do(
+				exceptions.Try(func() {
+					tried = true
+					if tt.shouldPanic {
+						panic(tt.panicWith)
+					}
+				}),
+				exceptions.Catch(func(e string) {
+					if e != tt.panicWith {
+						t.FailNow()
+					}
+					caught = true
+				}),
+				exceptions.Catch(func(e error) {
+					if e != tt.panicWith {
+						t.FailNow()
+					}
+					caught = true
+				}),
+				exceptions.Finally(func() {
+					finally = true
+				}),
+			)
+			if !tried {
+				t.Error("never tried")
+			}
+			if !caught && tt.shouldPanic {
+				t.Error("never caught")
+			}
+			if !finally {
+				t.Error("never finally-d")
+			}
+		})
+	}
 }
-
-// var _ = Describe("#Tryer", func() {
-// 	It("Should try, catch, finally", func() {
-// 		var exception1 throwable1
-// 		var exception2 throwable2
-// 		var finally string
-
-// 		exceptions.Try(func() {
-// 			finally = "try"
-// 			panic(throwable2{Cause: "panic!"})
-// 		}).Catch[throwable1](func() {
-// 			Fail("Should not catch this type")
-// 		}).Catch(&exception2, func() {
-// 			Expect(exception2.Cause).To(Equal("panic!"))
-// 			Expect(finally).To(Equal("finally"))
-// 		}).Finally(func() {
-// 			Expect(finally).To(Equal("try"))
-// 			finally = "finally"
-// 		}).Do()
-
-// 		Expect(exception2.Cause).To(Equal("panic!"))
-// 	})
-// })

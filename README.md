@@ -18,19 +18,23 @@ import (
 )
 
 func main() {
-	var ex1 Fish
-	var ex2 Shark
-
-	exceptions.Try(func() {
-		fmt.Println("Trying to fish...")
-		panic(Shark{Species: "Great White"})
-	}).Catch(&ex1, func() {
-		fmt.Println("Caught a Fish. It's a", ex1.Species)
-	}).Catch(&ex2, func() {
-		fmt.Println("Caught a Shark! It's a", ex2.Species)
-	}).Finally(func() {
-		fmt.Println("Stopped fishing.")
-	}).Do()
+	exceptions.Do(
+		exceptions.Try(func() {
+			fmt.Println("Trying to fish...")
+			panic(Shark{
+				Species: "Great White",
+			})
+		}),
+		exceptions.Catch(func(cause Shark) {
+			fmt.Printf("I caught a Shark! It's a %v\n", cause.Species)
+		}),
+		exceptions.Catch(func(cause error) {
+			fmt.Println("An error occurred:", cause)
+		}),
+		exceptions.Finally(func() {
+			fmt.Println("Stopped fishing.")
+		}),
+	)
 }
 
 type Fish struct {
@@ -47,10 +51,11 @@ The above program outputs:
 ```
 Trying to fish...
 Stopped fishing.
-Caught a Shark! It's a Great White
+I caught a Shark! It's a Great White!
 ```
 
 This follows the semantics of try...catch...finally where the (optional) `Finally` func is invoked directly after `Try` and before any `Catch` function is called. The `Catch` function takes two arguments: an "exception", and a function. The exception is a pointer to a struct and is set if and only if the panic value is of the same indirect type. Only the first catch that meets these requirements is invoked.
 
 Ironically, this package declares no exception types.
 
+Requires go version 1.18 or greater (for generics)

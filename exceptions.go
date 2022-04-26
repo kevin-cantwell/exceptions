@@ -27,9 +27,9 @@ func Do(try try, catchesOrFinally ...catchOrFinally) {
 			finally()
 		}
 
-		if exc := recover(); exc != nil {
+		if cause := recover(); cause != nil {
 			for _, catch := range catches {
-				catch(exc)
+				catch(cause)
 			}
 		}
 	}()
@@ -49,8 +49,8 @@ func Catch[C any](do func(C)) catchOrFinally {
 		do = func(C) {}
 	}
 	return catchOrFinally{
-		catch: func(caught any) {
-			if c, ok := caught.(C); ok {
+		catch: func(cause any) {
+			if c, ok := cause.(C); ok {
 				do(c)
 			}
 		},
