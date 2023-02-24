@@ -25,24 +25,24 @@ type then struct {
 	finally func()
 }
 
-func Catch[C any](do func(C)) then {
-	if do == nil {
-		do = func(C) {}
+func Catch[C any](catch func(C)) then {
+	if catch == nil {
+		catch = func(C) {}
 	}
 	return then{
 		catch: func(cause any) {
 			if c, ok := cause.(C); ok {
-				do(c)
+				catch(c)
 			}
 		},
 	}
 }
 
-func Finally(do func()) then {
-	if do == nil {
-		do = func() {}
+func Finally(finally func()) then {
+	if finally == nil {
+		finally = func() {}
 	}
 	return then{
-		finally: do,
+		finally: finally,
 	}
 }
