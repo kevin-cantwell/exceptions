@@ -11,6 +11,7 @@ func Try(try func(), thens ...then) {
 			}
 		}
 
+		// note: nil panics will not be detected unless wrapped with Throw
 		if cause := recover(); cause != nil {
 			for _, then := range thens {
 				if then.catch != nil {
@@ -44,6 +45,20 @@ func Catch[C any](catch func(C)) then {
 				catch(c)
 				return true
 			}
+
+			return false
+		},
+	}
+}
+
+func CatchNilThrows(catch func(any)) then {
+	return then{
+		catch: func(cause any) bool {
+			if np, ok := cause.(nilPanic); ok {
+				catch(np.cause)
+				return true
+			}
+
 			return false
 		},
 	}
@@ -61,7 +76,15 @@ func Finally(finally func()) then {
 	}
 }
 
-// Throw panics with the given cause. Just here for OCD reasons
+// Throw wraps a call to panic. If the cause itself is nil it will panic with a special type
+// that wraps the nil. To detect nil Throws, use CatchNilThrows.
 func Throw(cause any) {
+	if cause == nil {
+		panic(nilPanic{cause: cause})
+	}
 	panic(cause)
+}
+
+type nilPanic struct {
+	cause any
 }
