@@ -1,54 +1,35 @@
 package exceptions
 
-type try struct {
-	do func()
-}
-
-type catchOrFinally struct {
-	catch   func(any)
-	finally func()
-}
-
-func Do(try try, catchesOrFinally ...catchOrFinally) {
-	var catches []func(any)
-	var finally func()
-	for _, cof := range catchesOrFinally {
-		if cof.catch != nil {
-			catches = append(catches, cof.catch)
-		}
-		if cof.finally != nil {
-			finally = cof.finally
-			break // Do not respect catches that come after a call to finally
-		}
-	}
-
+func Try(do func(), thens ...then) {
 	defer func() {
-		if finally != nil {
-			finally()
+		for _, then := range thens {
+			if then.finally != nil {
+				then.finally()
+			}
 		}
 
 		if cause := recover(); cause != nil {
-			for _, catch := range catches {
-				catch(cause)
+			for _, then := range thens {
+				if then.catch != nil {
+					then.catch(cause)
+				}
 			}
 		}
 	}()
 
-	try.do()
+	do()
 }
 
-func Try(do func()) try {
-	if do == nil {
-		do = func() {}
-	}
-	return try{do: do}
+type then struct {
+	catch   func(any)
+	finally func()
 }
 
-func Catch[C any](do func(C)) catchOrFinally {
+func Catch[C any](do func(C)) then {
 	if do == nil {
 		do = func(C) {}
 	}
-	return catchOrFinally{
+	return then{
 		catch: func(cause any) {
 			if c, ok := cause.(C); ok {
 				do(c)
@@ -57,11 +38,11 @@ func Catch[C any](do func(C)) catchOrFinally {
 	}
 }
 
-func Finally(do func()) catchOrFinally {
+func Finally(do func()) then {
 	if do == nil {
 		do = func() {}
 	}
-	return catchOrFinally{
+	return then{
 		finally: do,
 	}
 }
