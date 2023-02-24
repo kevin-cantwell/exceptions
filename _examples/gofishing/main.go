@@ -9,24 +9,37 @@ import (
 func main() {
 	Try(func() {
 		fmt.Println("Trying to fish...")
-		panic(Shark{
-			IsVegetarian: true,
-		})
-	}, Catch(func(cause Shark) {
-		fmt.Printf("I caught a Shark! Vegetarian?: %v\n", cause.IsVegetarian)
-	}), Catch(func(cause Fish) {
-		fmt.Printf("I caught a Fish! Nemo?: %v\n", cause.IsNemo)
-	}), Catch(func(cause error) {
-		fmt.Println("An error occurred:", cause)
+		// cause a panic with a Shark
+		panic(Shark{})
+	}, Catch(func(cause Fish) {
+		// gets skipped
+		fmt.Println("I caught a Fish!")
+	}), Catch(func(cause Shark) {
+		// gets called
+		fmt.Println("I caught a Shark!")
+	}), Catch(func(cause Swimmer) {
+		// gets skipped
+		fmt.Println("I caught a Swimmer!")
 	}), Finally(func() {
+		// gets called
 		fmt.Println("Stopped fishing.")
 	}))
 }
 
+type Swimmer interface {
+	Swim() string
+}
+
 type Fish struct {
-	IsNemo bool
+}
+
+func (f Fish) Swim() string {
+	return fmt.Sprint("Fish is swimming...")
 }
 
 type Shark struct {
-	IsVegetarian bool
+}
+
+func (s Shark) Swim() string {
+	return fmt.Sprint("Shark is swimming...")
 }
