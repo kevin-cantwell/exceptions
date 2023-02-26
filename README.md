@@ -22,7 +22,7 @@ https://github.com/kevin-cantwell/exceptions/blob/abf8ffbf8b48e0e3a25a6f96b6a96c
 The above program outputs:
 ```
 caught: runtime error: index out of range [2] with length 0
-This will print before catching the error.
+This will print after catching the error.
 ```
 
 https://github.com/kevin-cantwell/exceptions/blob/abf8ffbf8b48e0e3a25a6f96b6a96cf99ea7254c/_examples/nilpanic/main.go#L9-L19
