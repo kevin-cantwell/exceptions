@@ -8,10 +8,11 @@ import (
 
 func main() {
 	Try(func() {
-		// panic(nil) is undetectable. Just a "feature" of Go.
-		Throw(nil)
-	}, CatchNilThrows(func(cause any) {
-		fmt.Println("nil panic!", cause)
+		// Typically, nil panics are not detected at runtime. But we can detect them if they
+		// happen in the Try block.
+		panic(nil)
+	}, CatchNil(func(cause any) {
+		fmt.Printf("nil panic! %T\n", cause)
 	}), Finally(func() {
 		// gets called
 		fmt.Println("This will print after catching the error.")

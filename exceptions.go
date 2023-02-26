@@ -4,6 +4,10 @@ package exceptions
 // the panic is recovered and its value is passed to the first Catch block that matches
 // the recovered type. If no suitable Catch is found, it panics with the recovered value.
 func Try(try func(), thens ...then) {
+	var (
+		// remains true if and only if try panics
+		panicked bool = true
+	)
 	defer func() {
 		defer func() {
 			for _, then := range thens {
@@ -12,13 +16,11 @@ func Try(try func(), thens ...then) {
 				}
 			}
 		}()
-
-		// note: nil panics will not be detected unless wrapped with Throw
-		if cause := recover(); cause != nil {
+		if panicked {
+			cause := recover()
 			for _, then := range thens {
 				if then.catch != nil {
 					if caught := then.catch(cause); caught {
-						caught = true
 						return
 					}
 				}
@@ -26,8 +28,8 @@ func Try(try func(), thens ...then) {
 			panic(cause)
 		}
 	}()
-
 	try()
+	panicked = false
 }
 
 type then struct {
@@ -48,20 +50,19 @@ func Catch[C any](catch func(C)) then {
 				catch(c)
 				return true
 			}
-
 			return false
 		},
 	}
 }
 
-func CatchNilThrows(catch func(any)) then {
+// CatchNil is a special catch block used for nil panics.
+func CatchNil(catch func(any)) then {
 	return then{
 		catch: func(cause any) bool {
-			if np, ok := cause.(nilPanic); ok {
-				catch(np.cause)
+			if cause == nil {
+				catch(cause)
 				return true
 			}
-
 			return false
 		},
 	}
@@ -77,17 +78,4 @@ func Finally(finally func()) then {
 	return then{
 		finally: finally,
 	}
-}
-
-// Throw wraps a call to panic. If the cause itself is nil it will panic with a special type
-// that wraps the nil. To detect nil Throws, use CatchNilThrows.
-func Throw(cause any) {
-	if cause == nil {
-		panic(nilPanic{cause: cause})
-	}
-	panic(cause)
-}
-
-type nilPanic struct {
-	cause any
 }
