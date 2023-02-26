@@ -13,6 +13,8 @@ func main() {
 		}, Catch(func(cause int) {
 			fmt.Println("caught:", cause)
 			panic("re-throw")
+		}), Finally(func() {
+			fmt.Println("finally gets called even if catch re-throws")
 		}))
 	}, Catch(func(cause string) {
 		fmt.Println("caught:", cause)
