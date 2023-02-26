@@ -5,17 +5,20 @@ package exceptions
 // the recovered type. If no suitable Catch is found, it panics with the recovered value.
 func Try(try func(), thens ...then) {
 	defer func() {
-		for _, then := range thens {
-			if then.finally != nil {
-				then.finally()
+		defer func() {
+			for _, then := range thens {
+				if then.finally != nil {
+					then.finally()
+				}
 			}
-		}
+		}()
 
 		// note: nil panics will not be detected unless wrapped with Throw
 		if cause := recover(); cause != nil {
 			for _, then := range thens {
 				if then.catch != nil {
 					if caught := then.catch(cause); caught {
+						caught = true
 						return
 					}
 				}

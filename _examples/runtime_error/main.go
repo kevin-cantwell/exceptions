@@ -16,6 +16,6 @@ func main() {
 		fmt.Println("caught:", cause)
 	}), Finally(func() {
 		// gets called
-		fmt.Println("This will print before catching the error.")
+		fmt.Println("This will print after catching the error.")
 	}))
 }
