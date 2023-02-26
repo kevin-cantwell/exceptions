@@ -8,7 +8,7 @@ Still here? Ok cool.
 
 Package `exceptions` brings the old try/catch/finally pattern you know and love to Go. It's a complete abomination of everything that is holy about Go and if you use it your peers will mock you and your friends will abandon you. Here's how it works:
 
-https://github.com/kevin-cantwell/exceptions/blob/f50a8a3c36260ad3b99f9e97c8c619304daecf20/_examples/gofishing/main.go#L9-L27
+https://github.com/kevin-cantwell/exceptions/blob/e981e831ad71acb2ef102cda772d983e5dbd2bd6/_examples/gofishing/main.go#L10-L26
 
 The above program outputs:
 ```
@@ -17,7 +17,7 @@ I caught a Shark!
 Stopped fishing.
 ```
 
-https://github.com/kevin-cantwell/exceptions/blob/abf8ffbf8b48e0e3a25a6f96b6a96cf99ea7254c/_examples/runtime_error/main.go#L9-L21
+https://github.com/kevin-cantwell/exceptions/blob/e981e831ad71acb2ef102cda772d983e5dbd2bd6/_examples/runtime_error/main.go#L10-L20
 
 The above program outputs:
 ```
@@ -25,7 +25,7 @@ caught: runtime error: index out of range [2] with length 0
 This will print after catching the error.
 ```
 
-https://github.com/kevin-cantwell/exceptions/blob/abf8ffbf8b48e0e3a25a6f96b6a96cf99ea7254c/_examples/nilpanic/main.go#L9-L19
+https://github.com/kevin-cantwell/exceptions/blob/e981e831ad71acb2ef102cda772d983e5dbd2bd6/_examples/nilpanic/main.go#L10-L18
 
 The above program outputs:
 ```
