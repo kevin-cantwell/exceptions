@@ -25,7 +25,7 @@ caught: runtime error: index out of range [2] with length 0
 This will print after catching the error.
 ```
 
-https://github.com/kevin-cantwell/exceptions/blob/e981e831ad71acb2ef102cda772d983e5dbd2bd6/_examples/nilpanic/main.go#L10-L18
+https://github.com/kevin-cantwell/exceptions/blob/28e7d3e02e0e5c0daba6709607616958cb1c94a0/_examples/nilpanic/main.go#L10-L19
 
 The above program outputs:
 ```
