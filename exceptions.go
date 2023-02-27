@@ -59,7 +59,8 @@ func Catch[C any](catch func(C)) then {
 
 // CatchNil is a special catch block used for nil panics. CatchNil will catch both typed nils
 // (eg: panic((*T)nil) ) and untyped nils (eg: panic(nil) ). In order to detect typed-nils, it
-// makes use of the reflec package, So it is not as efficient as Catch.
+// makes use of the reflec package, So it is not as efficient as Catch. If the cause is an untyped
+// nil then `cause == nil` will be true. If the cause is a typed nil then `cause == nil` will be false.
 func CatchNil(catch func(any)) then {
 	return then{
 		catch: func(cause any) bool {
