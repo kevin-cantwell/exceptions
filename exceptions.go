@@ -1,5 +1,7 @@
 package exceptions
 
+import "reflect"
+
 // Try executes the given function then invokes all Finally blocks. If the try function panics,
 // the panic is recovered and its value is passed to the first Catch block that matches
 // the recovered type. If no suitable Catch is found, it panics with the recovered value.
@@ -55,11 +57,20 @@ func Catch[C any](catch func(C)) then {
 	}
 }
 
-// CatchNil is a special catch block used for nil panics.
+// CatchNil is a special catch block used for nil panics. CatchNil will catch both typed nils
+// (eg: panic((*T)nil) ) and untyped nils (eg: panic(nil) ). In order to detect typed-nils, it
+// makes use of the reflec package, So it is not as efficient as Catch.
 func CatchNil(catch func(any)) then {
 	return then{
 		catch: func(cause any) bool {
+			// Detect untyped-nils
 			if cause == nil {
+				catch(cause)
+				return true
+			}
+			// Detect typed-nils
+			val := reflect.ValueOf(cause)
+			if val.Kind() == reflect.Ptr && val.IsNil() {
 				catch(cause)
 				return true
 			}
